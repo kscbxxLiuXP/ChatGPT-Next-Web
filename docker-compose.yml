@@ -1,13 +1,11 @@
 version: "3.9"
 services:
   chatgpt-next-web:
+    image: chatgpt-next-web
     container_name: chatgpt-next-web
     build:
       context: .
       dockerfile: Dockerfile
-      args:
-        - http_proxy=http://10.80.44.106:7890
-        - https_proxy=http://10.80.44.106:7890
     ports:
       - 3000:3000
     environment:
@@ -21,3 +19,4 @@ services:
       - ENABLE_BALANCE_QUERY=$ENABLE_BALANCE_QUERY
       - DISABLE_FAST_LINK=$DISABLE_FAST_LINK
       - OPENAI_SB=$OPENAI_SB
+    restart: always

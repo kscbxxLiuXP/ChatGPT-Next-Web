@@ -1,44 +1,40 @@
 FROM node:18-alpine AS base
+#--------------------------------------
+#yarn install
+# FROM base AS deps
 
-FROM base AS deps
+# RUN apk add --no-cache libc6-compat
 
-RUN apk add --no-cache libc6-compat
+# WORKDIR /app
 
-WORKDIR /app
+# COPY package.json yarn.lock ./
 
-COPY package.json yarn.lock ./
+# RUN yarn config set registry 'https://registry.npm.taobao.org'
+# RUN yarn install
+#--------------------------------------
+# FROM base AS builder
 
-RUN yarn config set registry 'https://registry.npm.taobao.org'
-RUN yarn install
+# RUN apk update && apk add --no-cache git
 
-FROM base AS builder
+# ENV OPENAI_API_KEY=""
+# ENV GOOGLE_API_KEY=""
+# ENV CODE=""
 
-RUN apk update && apk add --no-cache git
+# WORKDIR /app
+# COPY node_modules ./node_modules
+# COPY . .
 
-ENV OPENAI_API_KEY=""
-ENV GOOGLE_API_KEY=""
-ENV CODE=""
-
-WORKDIR /app
-COPY --from=deps /app/node_modules ./node_modules
-COPY . .
-
-RUN yarn build
-
+# RUN yarn build
+#--------------------------------------
 FROM base AS runner
 WORKDIR /app
 
 RUN apk add proxychains-ng
 
-ENV PROXY_URL=""
-ENV OPENAI_API_KEY=""
-ENV GOOGLE_API_KEY=""
-ENV CODE=""
-
-COPY --from=builder /app/public ./public
-COPY --from=builder /app/.next/standalone ./
-COPY --from=builder /app/.next/static ./.next/static
-COPY --from=builder /app/.next/server ./.next/server
+COPY  public ./public
+COPY  .next/standalone ./
+COPY  .next/static ./.next/static
+COPY  .next/server ./.next/server
 
 EXPOSE 3000
 
